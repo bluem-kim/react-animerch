@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@plugin "tailgrids/plugin";
+
+/* Ensure class-based dark mode toggling under v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+	html { font-family: theme('fontFamily.sans'); }
+	body { @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100; }
+}
+
+@layer components {
+	/* Consistent form controls: clearer borders and focus */
+	input:not([type]),
+	input[type="text"],
+	input[type="email"],
+	input[type="number"],
+	input[type="password"],
+	input[type="search"],
+	input[type="tel"],
+	select,
+	textarea {
+		@apply w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/50 focus:outline-none hover:border-gray-400 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/40;
+	}
+
+	/* Select: add chevron and remove native arrow for consistent look */
+	select {
+		appearance: none;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M8.25 9.75L12 13.5l3.75-3.75'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: right 0.5rem center;
+		background-size: 1rem 1rem;
+		padding-right: 2rem;
+	}
+
+	/* Do not show background chevron for TGSelect (uses its own icon) */
+	.tg-select select { background-image: none !important; padding-right: 2rem; }
+	.tg-select select { @apply border border-gray-300 bg-white text-gray-900; }
+	@variant dark {
+		.tg-select select { @apply border-gray-700 bg-gray-900 text-gray-100; }
+	}
+}

@@ -1,0 +1,50 @@
+# Node dependencies
+node_modules/
+
+# Logs
+logs
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build outputs
+dist/
+build/
+coverage/
+.nyc_output/
+
+# Caches
+.cache/
+.tmp/
+.tmp-*
+.eslintcache
+.turbo/
+.parcel-cache/
+
+# Process IDs
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Editors/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Misc
+*.tgz
+*.orig
+*.rej
