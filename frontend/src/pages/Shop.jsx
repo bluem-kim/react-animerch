@@ -9,6 +9,7 @@ import { ArrowForward, Search, FilterList, Visibility, AddShoppingCart } from '@
 import { api } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { getColorValue, getContrastText } from '../utils/colors';
+import LoadingMore from '../components/LoadingMore';
 
 function Reveal({ children }) {
   const ref = useRef(null);
@@ -243,6 +244,7 @@ export default function Shop() {
   // Infinite scroll
   const sentinelRef = useRef(null);
   useEffect(() => {
+    if (loading) return;
     if (!hasMore) return;
     const el = sentinelRef.current;
     if (!el) return;
@@ -255,7 +257,7 @@ export default function Shop() {
           // Ensure the spinner shows for a moment for demo purposes
           const [{ batch, totalPages }] = await Promise.all([
             fetchPage(next),
-            sleep(1200)
+            sleep(1800)
           ]);
           setItems((prev) => [...prev, ...batch]);
           setPage(next);
@@ -268,7 +270,7 @@ export default function Shop() {
     }, { rootMargin: '400px 0px', threshold: 0.1 });
     io.observe(el);
     return () => io.disconnect();
-  }, [page, hasMore, loadingMore, fetchPage]);
+  }, [page, hasMore, loadingMore, fetchPage, loading]);
 
   // Client-side sort (for price)
   const sorted = useMemo(() => {
@@ -525,40 +527,40 @@ export default function Shop() {
                   </Grid>
                 ))
               ) : (
-                sorted.map(p => (
-                  <Grid size={{ xs: 12, sm: 4, md: 4, lg: 4, xl: 4 }} key={p._id}>
-                    <ProductCard p={p} />
-                  </Grid>
-                ))
-              )}
-            </Grid>
-
-            {/* Sentinel & status */}
-            <div ref={sentinelRef} style={{ height: 48 }} />
-            
-            {loadingMore && (
-              <>
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 1 }}>
-                  <CircularProgress size={18} sx={{ mr: 1 }} />
-                  <Typography variant="body2" color="text.secondary">Loading more…</Typography>
-                </Box>
-                <Grid container spacing={2.5} sx={{ mt: 0 }}>
-                  {Array.from({ length: PAGE_LIMIT }).map((_, i) => (
-                    <Grid size={{ xs: 12, sm: 4, md: 4, lg: 4, xl: 4 }} key={`sk-${i}`}>
-                      <Card sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                        <Box sx={{ width: '100%', height: 0, paddingBottom: '75%', position: 'relative', bgcolor: 'grey.100' }}>
-                          <Skeleton variant="rectangular" sx={{ position: 'absolute', top: 0, left: 0, width: '100%,', height: '100%' }} />
-                        </Box>
-                        <CardContent sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1, minHeight: 140 }}>
-                          <Skeleton variant="text" sx={{ height: 20 }} />
-                          <Skeleton variant="text" width="60%" sx={{ height: 16 }} />
-                        </CardContent>
-                      </Card>
+                <>
+                  {sorted.map(p => (
+                    <Grid size={{ xs: 12, sm: 4, md: 4, lg: 4, xl: 4 }} key={p._id}>
+                      <ProductCard p={p} />
                     </Grid>
                   ))}
-                </Grid>
-              </>
-            )}
+                  {/* Sentinel inside grid for visibility */}
+                  <Grid size={{ xs: 12 }}>
+                    <div ref={sentinelRef} style={{ height: 40 }} />
+                  </Grid>
+                  {/* Loading row + placeholders just like Home */}
+                  {loadingMore && (
+                    <>
+                      <Grid size={{ xs: 12 }}>
+                        <LoadingMore text="Loading more products…" />
+                      </Grid>
+                      {Array.from({ length: PAGE_LIMIT }).map((_, i) => (
+                        <Grid size={{ xs: 12, sm: 4, md: 4, lg: 4, xl: 4 }} key={`sk-${i}`}>
+                          <Card sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                            <Box sx={{ width: '100%', height: 0, paddingBottom: '75%', position: 'relative', bgcolor: 'grey.100' }}>
+                              <Skeleton variant="rectangular" sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+                            </Box>
+                            <CardContent sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1, minHeight: 140 }}>
+                              <Skeleton variant="text" sx={{ height: 20 }} />
+                              <Skeleton variant="text" width="60%" sx={{ height: 16 }} />
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </>
+                  )}
+                </>
+              )}
+            </Grid>
             
             {!loading && !sorted.length && (
               <Box sx={{ py: 8, textAlign: 'center' }}>

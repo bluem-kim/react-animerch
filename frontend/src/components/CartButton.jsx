@@ -49,10 +49,12 @@ export default function CartButton() {
                       }
                       secondary={
                         <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
-                          <Typography variant="body2">₱{Number(item.price).toFixed(2)}</Typography>
-                          {typeof item.stock === 'number' && (
-                            <Typography variant="caption" color="text.secondary">• Stock: {item.stock}</Typography>
-                          )}
+                          <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                            <Typography variant="body2">₱{Number(item.price).toFixed(2)}</Typography>
+                            {typeof item.stock === 'number' && (
+                              <Typography variant="caption" color="text.secondary">Stock: {item.stock}</Typography>
+                            )}
+                          </Box>
                           <Box sx={{ flexGrow: 1 }} />
                           <IconButton size="small" onClick={() => cart.updateQty(item.product, Math.max(1, item.quantity - 1))} disabled={item.quantity <= 1}>
                             <Remove fontSize="small" />
@@ -67,7 +69,7 @@ export default function CartButton() {
                               const clamped = Math.max(min, isNaN(raw) ? 1 : raw);
                               cart.updateQty(item.product, typeof max === 'number' ? Math.min(clamped, max) : clamped);
                             }}
-                            sx={{ width: 60 }}
+                            sx={{ width: 56 }}
                             inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', style: { textAlign: 'center' } }}
                           />
                           <IconButton size="small" onClick={() => {

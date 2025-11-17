@@ -6,8 +6,8 @@ function ProductCard({ product }) {
   const img = product?.photos?.[0]?.url || 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop';
   return (
     <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
-      <div className="aspect-[4/3] overflow-hidden bg-gray-50 dark:bg-gray-800">
-        <img src={img} alt={product.name} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+        <div className="aspect-[4/3] overflow-hidden bg-gray-50 dark:bg-gray-800">
+        <img src={img} alt={product.name} className="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" decoding="async" />
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between gap-3">
@@ -148,6 +148,11 @@ export default function Home() {
                   src="/hero.jpg"
                   alt="Hero"
                   className="h-full w-full object-cover"
+                  width={1200}
+                  height={900}
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
                 />
               </div>
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-indigo-600/10 to-transparent" />
@@ -172,9 +177,9 @@ export default function Home() {
           </div>
         ) : (
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((c) => (
+                {categories.map((c) => (
               <Link key={c.name} to={`/shop?category=${encodeURIComponent(c.name)}`} className="group relative block overflow-hidden rounded-lg">
-                <img src={c.img} alt={c.name} className="aspect-[4/3] w-full object-cover transition duration-300 group-hover:scale-105" />
+                <img src={c.img} alt={c.name} className="aspect-[4/3] w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" decoding="async" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
                 <div className="absolute bottom-3 left-3 rounded bg-white/90 px-3 py-1 text-sm font-medium text-gray-900 backdrop-blur dark:bg-gray-900/80 dark:text-white">
                   {c.name} <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">{c.count}</span>

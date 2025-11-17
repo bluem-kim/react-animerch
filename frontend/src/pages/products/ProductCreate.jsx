@@ -15,7 +15,7 @@ export default function ProductCreate() {
     if (values.color) fd.append('color', values.color);
     (values.photos || []).forEach(f => fd.append('photos', f));
     await api.post('/products', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-    navigate('/products', { state: { toast: { msg: 'Product created successfully', severity: 'success' } } });
+    navigate('/admin/products', { state: { toast: { msg: 'Product created successfully', severity: 'success' } } });
   };
 
   return (

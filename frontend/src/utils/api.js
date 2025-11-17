@@ -18,8 +18,11 @@ api.interceptors.response.use(
       const status = error?.response?.status;
       const msg = error?.response?.data?.message || '';
       if (status === 401) {
-        try { localStorage.removeItem('token'); } catch (_) {}
-        try { window.dispatchEvent(new CustomEvent('app:auth', { detail: { type: 'logout', reason: 'expired' } })); } catch (_) {}
+        const hadToken = !!localStorage.getItem('token') || !!(error?.config?.headers?.Authorization);
+        if (hadToken) {
+          try { localStorage.removeItem('token'); } catch (_) {}
+          try { window.dispatchEvent(new CustomEvent('app:auth', { detail: { type: 'logout', reason: 'expired' } })); } catch (_) {}
+        }
       }
       if (status === 403 && /deactivated/i.test(msg)) {
         try { localStorage.removeItem('token'); } catch (_) {}

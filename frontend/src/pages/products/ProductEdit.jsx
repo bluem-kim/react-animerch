@@ -28,7 +28,7 @@ export default function ProductEdit() {
     if (values.keepPhotoIds) fd.append('keepPhotoIds', JSON.stringify(values.keepPhotoIds));
     (values.photos || []).forEach(f => fd.append('photos', f));
     await api.put(`/products/${id}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-    navigate('/products', { state: { toast: { msg: 'Product updated successfully', severity: 'success' } } });
+    navigate('/admin/products', { state: { toast: { msg: 'Product updated successfully', severity: 'success' } } });
   };
 
   if (!initial) return <div className="text-gray-500">Loading…</div>;

@@ -1,24 +1,24 @@
 import { Link, Routes, Route, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense, lazy } from 'react';
 import { toggleTheme, getPreferredTheme } from './utils/theme';
 import './App.css';
-import ProductList from './pages/products/ProductList';
-import ProductCreate from './pages/products/ProductCreate';
-import ProductEdit from './pages/products/ProductEdit';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import Reviews from './pages/reviews/Reviews';
-import Trash from './pages/products/Trash';
-import Transactions from './pages/admin/Transactions';
-import Users from './pages/admin/Users';
-import CategoryList from './pages/categories/CategoryList';
-import CategoryForm from './pages/categories/CategoryForm';
 import Home from './pages/Home';
-import ProductDetails from './pages/ProductDetails';
-import Shop from './pages/Shop';
+const ProductList = lazy(() => import('./pages/products/ProductList'));
+const ProductCreate = lazy(() => import('./pages/products/ProductCreate'));
+const ProductEdit = lazy(() => import('./pages/products/ProductEdit'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const Reviews = lazy(() => import('./pages/reviews/Reviews'));
+const Trash = lazy(() => import('./pages/products/Trash'));
+const Transactions = lazy(() => import('./pages/admin/Transactions'));
+const Users = lazy(() => import('./pages/admin/Users'));
+const CategoryList = lazy(() => import('./pages/categories/CategoryList'));
+const CategoryForm = lazy(() => import('./pages/categories/CategoryForm'));
+const ProductDetails = lazy(() => import('./pages/ProductDetails'));
+const Shop = lazy(() => import('./pages/Shop'));
 import AuthModal from './components/AuthModal';
 import { CartProvider } from './context/CartContext';
-import Checkout from './pages/Checkout';
-import Profile from './pages/auth/Profile';
+const Checkout = lazy(() => import('./pages/Checkout'));
+const Profile = lazy(() => import('./pages/auth/Profile'));
 import Navbar from './components/Navbar';
 import { api } from './utils/api';
 import { auth } from './utils/firebase';
@@ -91,8 +91,16 @@ export default function App() {
         setAuthToast({ open: true, msg: 'Signed in successfully.', severity: 'success' });
         setChecking(true); await checkSession(); setChecking(false);
       } else if (type === 'logout') {
-        const msg = reason === 'deactivated' ? 'Your account has been deactivated. You have been signed out.' : 'You have been signed out.';
-        setAuthToast({ open: true, msg, severity: reason === 'deactivated' ? 'warning' : 'info' });
+        let msg = 'You have been signed out.';
+        let severity = 'info';
+        if (reason === 'deactivated') {
+          msg = 'Your account has been deactivated. You have been signed out.';
+          severity = 'warning';
+        } else if (reason === 'expired') {
+          msg = 'Your session expired. Please sign in again.';
+          severity = 'warning';
+        }
+        setAuthToast({ open: true, msg, severity });
         try { await signOut(auth()); } catch (_) {}
         try { localStorage.removeItem('token'); } catch (_) {}
         setUser(null);
@@ -116,8 +124,7 @@ export default function App() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const isDark = mode === 'dark' || (typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
-  const adminRoots = ['/admin', '/products', '/reviews', '/trash', '/categories'];
-  const isAdminLayout = adminRoots.some(p => pathname.startsWith(p));
+  const isAdminLayout = pathname.startsWith('/admin');
   const isMobile = useMediaQuery('(max-width:900px)');
 
   const muiTheme = createTheme({
@@ -134,13 +141,13 @@ export default function App() {
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/admin' },
     { divider: true, label: 'CATALOG' },
-    { text: 'Categories', icon: <CategoryIcon />, path: '/categories' },
-    { text: 'Products', icon: <InventoryIcon />, path: '/products' },
-    { text: 'Add Product', icon: <AddIcon />, path: '/products/new' },
+    { text: 'Categories', icon: <CategoryIcon />, path: '/admin/categories' },
+    { text: 'Products', icon: <InventoryIcon />, path: '/admin/products' },
+    { text: 'Add Product', icon: <AddIcon />, path: '/admin/products/new' },
     { divider: true, label: 'MANAGEMENT' },
     { text: 'Users', icon: <PersonIcon />, path: '/admin/users' },
-    { text: 'Reviews', icon: <ReviewsIcon />, path: '/reviews' },
-    { text: 'Trash', icon: <DeleteIcon />, path: '/trash' },
+    { text: 'Reviews', icon: <ReviewsIcon />, path: '/admin/reviews' },
+    { text: 'Trash', icon: <DeleteIcon />, path: '/admin/trash' },
     { divider: true, label: 'ORDERS' },
     { text: 'Orders', icon: <InventoryIcon />, path: '/admin/transactions' },
   ];
@@ -287,20 +294,25 @@ export default function App() {
               mt: 8,
             }}
           >
-            <Routes>
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/categories" element={<CategoryList />} />
-              <Route path="/admin/categories" element={<CategoryList />} />
-              <Route path="/admin/categories/create" element={<CategoryForm />} />
-              <Route path="/admin/categories/edit/:id" element={<CategoryForm />} />
-              <Route path="/products" element={<ProductList />} />
-              <Route path="/products/new" element={<ProductCreate />} />
-              <Route path="/products/:id/edit" element={<ProductEdit />} />
-              <Route path="/reviews" element={<Reviews />} />
-              <Route path="/admin/users" element={<Users />} />
-              <Route path="/admin/transactions" element={<Transactions />} />
-              <Route path="/trash" element={<Trash />} />
-            </Routes>
+            <Suspense fallback={
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh' }}>
+                <CircularProgress />
+              </Box>
+            }>
+              <Routes>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/categories" element={<CategoryList />} />
+                <Route path="/admin/categories/create" element={<CategoryForm />} />
+                <Route path="/admin/categories/edit/:id" element={<CategoryForm />} />
+                <Route path="/admin/products" element={<ProductList />} />
+                <Route path="/admin/products/new" element={<ProductCreate />} />
+                <Route path="/admin/products/:id/edit" element={<ProductEdit />} />
+                <Route path="/admin/reviews" element={<Reviews />} />
+                <Route path="/admin/users" element={<Users />} />
+                <Route path="/admin/transactions" element={<Transactions />} />
+                <Route path="/admin/trash" element={<Trash />} />
+              </Routes>
+            </Suspense>
           </Box>
         </Box>
       </ThemeProvider>
@@ -337,14 +349,21 @@ export default function App() {
           />
           <AuthModal open={authOpen} initialView={authView} onClose={() => setAuthOpen(false)} />
           <Box component="main" sx={{ flexGrow: 1 }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/shop" element={<Shop />} />
-              <Route path="/p/:id" element={<ProductDetails />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/checkout" element={<RequireAuth checking={checking} user={user}><Checkout /></RequireAuth>} />
-              <Route path="*" element={<Home />} />
-            </Routes>
+            <Suspense fallback={
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh' }}>
+                <CircularProgress />
+              </Box>
+            }>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/products" element={<Navigate to="/shop" replace />} />
+                <Route path="/p/:id" element={<ProductDetails />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/checkout" element={<RequireAuth checking={checking} user={user}><Checkout /></RequireAuth>} />
+                <Route path="*" element={<Home />} />
+              </Routes>
+            </Suspense>
           </Box>
           <Box component="footer" sx={{ borderTop: 1, borderColor: 'divider', py: 3 }}>
             <Container maxWidth="lg">

@@ -132,7 +132,7 @@ export default function ProductList() {
         <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200">
           <div>Category: <span className="font-medium">{categoryFilter}</span></div>
           <button
-            onClick={() => navigate('/products')}
+            onClick={() => navigate('/admin/products')}
             className="rounded-md border border-gray-300 px-2 py-1 text-xs hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
           >Clear</button>
         </div>
@@ -140,7 +140,7 @@ export default function ProductList() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-center">
         <h2 className="text-lg font-semibold">Products</h2>
         <div className="flex gap-2 sm:justify-end">
-          <Link to="/products/new" className="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-white shadow-default hover:bg-indigo-700">New Product</Link>
+          <Link to="/admin/products/new" className="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-white shadow-default hover:bg-indigo-700">New Product</Link>
           <button onClick={bulkDelete} disabled={!selected.size} className="inline-flex items-center justify-center rounded-md bg-rose-600 px-3 py-2 text-white shadow-default hover:bg-rose-700 disabled:opacity-50">Delete Selected</button>
         </div>
       </div>
@@ -192,7 +192,7 @@ export default function ProductList() {
                 </td>
                 <td className="px-4 py-3 text-right whitespace-nowrap">
                   <div className="inline-flex items-center gap-3">
-                    <Link to={`/products/${r._id}/edit`} className="text-indigo-600 hover:text-indigo-800 text-sm">Edit</Link>
+                    <Link to={`/admin/products/${r._id}/edit`} className="text-indigo-600 hover:text-indigo-800 text-sm">Edit</Link>
                     <button onClick={() => deleteOne(r._id)} className="text-rose-600 hover:text-rose-800 text-sm">Delete</button>
                   </div>
                 </td>
